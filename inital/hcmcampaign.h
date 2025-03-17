@@ -107,6 +107,18 @@ public:
     virtual string str() const = 0;
 };
 
+class Vehicle  :Unit
+{
+    private:
+    VehicleType vehicleType;
+    public:
+    Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType);
+   int getAttackScore()
+    {
+        double attackScore = (((int)vehicleType)*304+(quantity*weight))/30.00
+        cout << (ceil(attackScore));
+    }
+}
 class UnitList
 {
 private:
