@@ -115,10 +115,29 @@ class Vehicle  :Unit
     Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType);
    int getAttackScore()
     {
-        double attackScore = (((int)vehicleType)*304+(quantity*weight))/30.00
-        cout << (ceil(attackScore));
+        double attackScore = vehicleType*304+(quantity*weight)/30.00;
+        return (ceil(attackScore));
     }
+    string str()
+    {   string str = NULL;
+        str += "Vehicle["
+            += "quantity=" += quantity
+            += ",weight=" += weight
+            += ",pos=" += pos
+            += ",vehicleType=" += vehicleType;
+        return str;
+    }
+};
+class Infantry: Unit{
+private:
+InfantryType infantryType;
+public:
+Infantry(int quantity, int weight, Position pos, InfantryType infantryType)
+{
+
 }
+
+};
 class UnitList
 {
 private:
