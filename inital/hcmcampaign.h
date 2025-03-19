@@ -17,7 +17,7 @@
 /// Complete the following functions
 /// DO NOT modify any parameters in the functions.
 ////////////////////////////////////////////////////////////////////////
-
+#define YEAR 1975
 // Forward declaration
 class Unit;
 class UnitList;
@@ -43,7 +43,7 @@ class BattleField;
 
 class HCMCampaign;
 class Configuration;
-
+class additionalFunction;
 enum VehicleType
 {
     TRUCK,
@@ -100,7 +100,12 @@ protected:
     Position pos;
 
 public:
-    Unit(int quantity, int weight, Position pos);
+    Unit(int quantity, int weight, Position pos)
+    {
+        quantity= this->quantity;
+        weight = this->weight;
+        pos = this->pos;
+    }
     virtual ~Unit();
     virtual int getAttackScore() = 0;
     Position getCurrentPosition() const;
@@ -112,7 +117,13 @@ class Vehicle  :Unit
     private:
     VehicleType vehicleType;
     public:
-    Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType);
+    Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType)
+    {
+        quantity = this->quantity;
+        weight = this->weight;
+        pos = this->pos;
+        vehicleType = this->vehicleType;
+    }
    int getAttackScore()
     {
         double attackScore = vehicleType*304+(quantity*weight)/30.00;
@@ -127,6 +138,7 @@ class Vehicle  :Unit
             += ",vehicleType=" += vehicleType;
         return str;
     }
+    
 };
 class Infantry: Unit{
 private:
@@ -134,9 +146,30 @@ InfantryType infantryType;
 public:
 Infantry(int quantity, int weight, Position pos, InfantryType infantryType)
 {
-
+ quantity= this->quantity;
+ weight = this->weight;
+ pos = this->pos;
+ infantryType= this->infantryType;
+};
+int getAttackScore()
+{
+    int score = infantryType*56 + quantity*weight;
+    additionalFunction s;
+    if (infantryType == SPECIALFORCES && s.isPerfectSquare(weight))
+    {
+       score+=75; 
+    }
+    int PersonalNumber = s.calculatePersonalNumber(YEAR , score);
+    if (PersonalNumber > 7)
+    {
+        quantity = ceil(quantity*1.2);
+    }
+    else if (PersonalNumber < 3)
+    {
+        quantity = ceil(quantity*0.9);
+    }
+    score = infantryType*56 + quantity*weight;
 }
-
 };
 class UnitList
 {
@@ -186,4 +219,36 @@ public:
     string printResult();
 };
 
+class additionalFunction
+{public:
+ bool isPerfectSquare(int a)
+    {   
+        double x = sqrt(a);
+        if (ceil(x)==floor(x))
+        {
+            return 1;
+        }
+        return 0;
+    }
+int breakNum(int a)
+{   int temp = 0;
+    while (a)
+    {
+    temp += a%10;
+    a/=10;
+    }
+    return temp;
+}
+int calculatePersonalNumber(int a, int b)
+{   int temp1 = breakNum(a);
+    int temp2 = breakNum(b);
+    int temp = temp1 + temp2;
+    while (temp>9)
+    {
+        breakNum(temp);
+    }
+    return temp;
+}
+
+};
 #endif
