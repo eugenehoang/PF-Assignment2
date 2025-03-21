@@ -42,11 +42,11 @@ class Vehicle  :Unit
     }
     string str()
     {   string str = NULL;
-        str += "Vehicle["
-            += "quantity=" += quantity
-            += ",weight=" += weight
-            += ",pos=" += pos
-            += ",vehicleType=" += vehicleType;
+        str + "Vehicle["
+            + "quantity=" + to_string(quantity)
+            + ",weight=" + to_string(weight)
+            + ",pos=" + pos.str()
+            + ",vehicleType=" + vehicleType;
         return str;
     }
     
@@ -86,7 +86,7 @@ class Infantry: Unit{
       return "Infantry[infantryType=" + to_string(infantryType) +
       ", quantity= " + to_string(quantity) +
       ", weight=" + to_string(weight) +
-      ", pos=" + to_string(pos) + "]";
+      ", pos=" + pos.str() + "]";
      
   };
 };  
@@ -122,19 +122,44 @@ class LiberationArmy : Army
 
 };
 
-class ARVN : ArmyArmy
+class ARVN : Army
 {
 
 };
 
+class Node
+{
+    public:
+      Unit* army ;
+      Node* next;
+    
+    
+      Node* head = new Node;
+      head->next = nullptr;
+    void insert(Unit* unit, bool condition)
+    { Node* temp = new Node;
+      temp = head;
+
+      if (condition)
+      {
+
+      }
+    };
+  }
 class UnitList
 {
 private:
-    int capacity;
-    // TODO
+    int capacity;  
 public:
+enum condition {first, last};
     UnitList(int capacity);
-    bool insert(Unit *unit);                   // return true if insert successfully
+    bool insert(Unit *unit)
+    {
+
+
+    }
+    
+    // return true if insert successfully
     bool isContain(VehicleType vehicleType);   // return true if it exists
     bool isContain(InfantryType infantryType); // return true if it exists
     string str() const;
