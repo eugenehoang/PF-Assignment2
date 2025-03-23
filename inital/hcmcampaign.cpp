@@ -20,21 +20,31 @@ public:
     virtual int getAttackScore() = 0;
     Position getCurrentPosition() const;
     virtual string str() const = 0;
+    virtual Type getType() const;
 };
 
 
-class Vehicle  :Unit
+class Vehicle : public Unit
 {
     private:
     VehicleType vehicleType;
     public:
-    Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType)
-    {
-        quantity = this->quantity;
-        weight = this->weight;
-        pos = this->pos;
-        vehicleType = this->vehicleType;
+    string getVehicleType(){
+        string arr[7] = 
+            {"TRUCK",
+            "MORTAR",
+            "ANTIAIRCRAFT",
+            "ARMOREDCAR",
+            "APC",
+            "ARTILLERY",
+            "TANK"};
+            return arr[vehicleType];
     }
+    Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType) : Unit(quantity, weight,pos)
+    {
+        this->vehicleType = vehicleType;
+    }
+
    int getAttackScore()
     {
         double attackScore = vehicleType*304+(quantity*weight)/30.00;
@@ -46,23 +56,37 @@ class Vehicle  :Unit
             + "quantity=" + to_string(quantity)
             + ",weight=" + to_string(weight)
             + ",pos=" + pos.str()
-            + ",vehicleType=" + vehicleType;
+            + ",vehicleType=" + getVehicleType();
         return str;
     }
-    
+    Type getType()
+    {
+        return VEHICLE;
+    }
 };
 
-class Infantry: Unit{
+class Infantry: public Unit{
   private:
   InfantryType infantryType;
   public:
-  Infantry(int quantity, int weight, Position pos, InfantryType infantryType)
+  string getinfantryType()
   {
-   quantity= this->quantity;
-   weight = this->weight;
-   pos = this->pos;
+    string array[6] = {
+        "SNIPER",
+        "ANTIAIRCRAFTSQUAD",
+        "MORTARSQUAD",
+        "ENGINEER",
+        "SPECIALFORCES",
+        "REGULARINFANTRY"
+    };
+  }
+  Infantry(int quantity, int weight, Position pos, InfantryType infantryType) : Unit(quantity, weight, pos)
+  {
    infantryType= this->infantryType;
   };
+ //Infantry(int quantity, int weight, Position pos, InfantryType infantryType) : Unit (quantity,weight, pos), infantryType(infantryType){
+
+ 
   int getAttackScore()
   {
       int score = infantryType*56 + quantity*weight;
@@ -83,12 +107,16 @@ class Infantry: Unit{
       score = infantryType*56 + quantity*weight;
   }
    string str() {
-      return "Infantry[infantryType=" + to_string(infantryType) +
+      return "Infantry[infantryType=" + getinfantryType() +
       ", quantity= " + to_string(quantity) +
       ", weight=" + to_string(weight) +
       ", pos=" + pos.str() + "]";
      
   };
+  Type getType()
+  {
+    return INFANTRY;
+  }
 };  
 
 class Army
@@ -100,16 +128,46 @@ protected:
     BattleField *battleField;
 
 public:
-    Army(Unit **unitArray, int size, string name, BattleField *battleField);
-    virtual void fight(Army *enemy, bool defense = false) = 0;
-    virtual string str() const = 0;
+    Army(Unit **unitArray, int size, string name, BattleField *battleField)
+    {   LF = 0;
+        EXP = 0;
+       this->name = name;
+       this->battleField = battleField; 
+       for (int i=0; i<size; i++)
+       {
+       if ((*(unitArray))->getType() == INFANTRY )
+       {
+            EXP += (*(unitArray))->getAttackScore();
+       }
+       else if((*(unitArray))->getType() == VEHICLE)
+       {
+            LF +=  (*(unitArray))->getAttackScore();
+       }
+    }
+    };
+    virtual void fight(Army *enemy, bool defense = false) = 0
+    {
+
+    };
+    virtual string str() const = 0
+    {
+        string s ="ARVN[";
+        s + "name="+name+"," "LF" + "=" + to_string(LF) + "," +
+        "EXP" + "=" + to_string(EXP) + "," +
+        "unitList" + "=" + unitList->str() + "," +
+        "battleField" + "=" + battleField->str() + "]";
+    };
 };
 
 class LiberationArmy : Army
 {
     private:
     public:
-    LiberationArmy(const Unit** unitArray , int size , string name , BattleField* battleField);
+    
+    LiberationArmy(const Unit** unitArray , int size , string name , BattleField* battleField)
+    {
+        
+    }
     void fight(Army* enemy , bool defense = false)
     {
         if (defense == 0)
@@ -127,32 +185,17 @@ class ARVN : Army
 
 };
 
-class Node
-{
-    public:
-      Unit* army ;
-      Node* next;
-    
-    
-      Node* head = new Node;
-      head->next = nullptr;
-    void insert(Unit* unit, bool condition)
-    { Node* temp = new Node;
-      temp = head;
 
-      if (condition)
-      {
-
-      }
-    };
-  }
-class UnitList
+class UnitList : public Vehicle, Infantry
 {
 private:
+
+    
     int capacity;  
 public:
-enum condition {first, last};
-    UnitList(int capacity);
+
+    UnitList(int capacity): capacity(capacity)
+    {};
     bool insert(Unit *unit)
     {
 
@@ -173,13 +216,37 @@ private:
     int r, c;
 
 public:
-    Position(int r = 0, int c = 0);
-    Position(const string &str_pos); // Example: str_pos = "(1,15)"
-    int getRow() const;
-    int getCol() const;
-    void setRow(int r);
-    void setCol(int c);
-    string str() const; // Example: returns "(1,15)"
+    Position(int r = 0, int c = 0)
+    {
+        this->r = r;
+        this->c = c;
+    }
+    Position(const string &str_pos)
+    {
+        char ignore;
+        std::stringstream ss(str_pos);
+        ss >> ignore >> r >> ignore >> c >> ignore; // Parse format "(r,c)"
+    }; // Example: str_pos = "(1,15)"
+    int getRow() const
+    {
+        return r;
+    }
+    int getCol() const
+    {
+        return c;
+    }
+    void setRow(int r)
+    {
+        this->r = r;
+    }
+    void setCol(int c)
+    {
+        this->c=c;
+    }
+    string str() const
+    {
+        return "(" + to_string(r) + "," + to_string(c) + ")";
+    }; // Example: returns "(1,15)"
 };
 
 class TerrainElement
@@ -189,7 +256,12 @@ public:
     ~TerrainElement();
     virtual void getEffect(Army *army) = 0;
 };
-
+class Road;
+class Mountain;
+class River;
+class Urban;
+class Fortification;
+class SpecialZone;
 class BattleField
 {
 private:

@@ -44,6 +44,46 @@ class BattleField;
 class HCMCampaign;
 class Configuration;
 class additionalFunction;
+enum Type
+{
+    VEHICLE,
+    INFANTRY
+};
+class LinkedLists{
+
+
+};
+ class Node 
+ {  public:
+    Unit* data;
+    Node* next;
+    Node(){next = nullptr;};
+    Node(Unit* unit) : data(unit), next(nullptr){}
+    // constr
+ };
+ class LinkedList
+ {  private:
+    Node* head = new Node();
+    public:
+    Node* getHead() {return head;}
+
+    LinkedList();
+    ~LinkedList()
+    {
+        Node* now = head;
+        while (now)
+        {
+            Node* temp = now;
+            now = now->next;
+            delete temp; 
+        }
+        delete now;
+        void add(Unit *uInfantry);
+        void add(Unit *uVehicle);
+    }
+
+     
+ };
 enum VehicleType
 {
     TRUCK,
@@ -64,160 +104,13 @@ enum InfantryType
     REGULARINFANTRY
 };
 
-class Army
-{
-protected:
-    int LF, EXP;
-    string name;
-    UnitList *unitList;
-    BattleField *battleField;
 
-public:
-    Army(Unit **unitArray, int size, string name, BattleField *battleField);
-    virtual void fight(Army *enemy, bool defense = false) = 0;
-    virtual string str() const = 0;
-};
 
-class Position
-{
-private:
-    int r, c;
 
-public:
-    Position(int r = 0, int c = 0);
-    Position(const string &str_pos); // Example: str_pos = "(1,15)"
-    int getRow() const;
-    int getCol() const;
-    void setRow(int r);
-    void setCol(int c);
-    string str() const; // Example: returns "(1,15)"
-};
 
-class Unit
-{
-protected:
-    int quantity, weight;
-    Position pos;
 
-public:
-    Unit(int quantity, int weight, Position pos)
-    {
-        quantity= this->quantity;
-        weight = this->weight;
-        pos = this->pos;
-    }
-    virtual ~Unit();
-    virtual int getAttackScore() = 0;
-    Position getCurrentPosition() const;
-    virtual string str() const = 0;
-};
 
-class Vehicle  :Unit
-{
-    private:
-    VehicleType vehicleType;
-    public:
-    Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType)
-    {
-        quantity = this->quantity;
-        weight = this->weight;
-        pos = this->pos;
-        vehicleType = this->vehicleType;
-    }
-   int getAttackScore()
-    {
-        double attackScore = vehicleType*304+(quantity*weight)/30.00;
-        return (ceil(attackScore));
-    }
-    string str()
-    {   string str = NULL;
-        str += "Vehicle["
-            += "quantity=" += quantity
-            += ",weight=" += weight
-            += ",pos=" += pos
-            += ",vehicleType=" += vehicleType;
-        return str;
-    }
-    
-};
-class Infantry: Unit{
-private:
-InfantryType infantryType;
-public:
-Infantry(int quantity, int weight, Position pos, InfantryType infantryType)
-{
- quantity= this->quantity;
- weight = this->weight;
- pos = this->pos;
- infantryType= this->infantryType;
-};
-int getAttackScore()
-{
-    int score = infantryType*56 + quantity*weight;
-    additionalFunction s;
-    if (infantryType == SPECIALFORCES && s.isPerfectSquare(weight))
-    {
-       score+=75; 
-    }
-    int PersonalNumber = s.calculatePersonalNumber(YEAR , score);
-    if (PersonalNumber > 7)
-    {
-        quantity = ceil(quantity*1.2);
-    }
-    else if (PersonalNumber < 3)
-    {
-        quantity = ceil(quantity*0.9);
-    }
-    score = infantryType*56 + quantity*weight;
-}
-};
-class UnitList
-{
-private:
-    int capacity;
-    // TODO
-public:
-    UnitList(int capacity);
-    bool insert(Unit *unit);                   // return true if insert successfully
-    bool isContain(VehicleType vehicleType);   // return true if it exists
-    bool isContain(InfantryType infantryType); // return true if it exists
-    string str() const;
-    // TODO
-};
 
-class TerrainElement
-{
-public:
-    TerrainElement();
-    ~TerrainElement();
-    virtual void getEffect(Army *army) = 0;
-};
-
-class BattleField
-{
-private:
-    int n_rows, n_cols;
-    // TODO
-public:
-    BattleField(int n_rows, int n_cols, vector<Position *> arrayForest,
-                vector<Position *> arrayRiver, vector<Position *> arrayFortification,
-                vector<Position *> arrayUrban, vector<Position *> arraySpecialZone);
-    ~BattleField();
-};
-
-class HCMCampaign
-{
-private:
-    Configuration *config;
-    BattleField *battleField;
-    LiberationArmy *liberationArmy;
-    ARVN *ARVN;
-
-public:
-    HCMCampaign(const string &config_file_path);
-    void run();
-    string printResult();
-};
 
 class additionalFunction
 {public:
