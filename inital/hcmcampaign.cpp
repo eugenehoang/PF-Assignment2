@@ -3,27 +3,41 @@
 ////////////////////////////////////////////////////////////////////////
 /// STUDENT'S ANSWER BEGINS HERE
 ////////////////////////////////////////////////////////////////////////
+
 class Unit
 {
 protected:
-    int quantity, weight;
+    int quantity;
+    int weight;
     Position pos;
 
 public:
-    Unit(int quantity, int weight, Position pos)
-    {
-        quantity= this->quantity;
-        weight = this->weight;
-        pos = this->pos;
-    }
-    virtual ~Unit();
+    Unit(int quantity, int weight, Position pos) : quantity(quantity), weight(weight), pos(pos) {}
     virtual int getAttackScore() = 0;
-    Position getCurrentPosition() const;
-    virtual string str() const = 0;
-    virtual Type getType() const;
+    virtual string str() = 0;
+    virtual Type getType() = 0;
+    virtual ~Unit() {}
 };
+class additionalFunction {
+public:
+    bool isPerfectSquare(int num) {
+        int sqrtNum = sqrt(num);
+        return (sqrtNum * sqrtNum == num);
+    }
 
-
+    int calculatePersonalNumber(int year, int score) {
+        int sum = year + score;
+        while (sum >= 10) {
+            int temp = 0;
+            while (sum > 0) {
+                temp += sum % 10;
+                sum /= 10;
+            }
+            sum = temp;
+        }
+        return sum;
+    }
+};
 class Vehicle : public Unit
 {
     private:
@@ -40,6 +54,7 @@ class Vehicle : public Unit
             "TANK"};
             return arr[vehicleType];
     }
+    Vehicle();
     Vehicle(int quantity, int weight, Position pos, VehicleType vehicleType) : Unit(quantity, weight,pos)
     {
         this->vehicleType = vehicleType;
@@ -128,27 +143,9 @@ protected:
     BattleField *battleField;
 
 public:
-    Army(Unit **unitArray, int size, string name, BattleField *battleField)
-    {   LF = 0;
-        EXP = 0;
-       this->name = name;
-       this->battleField = battleField; 
-       for (int i=0; i<size; i++)
-       {
-       if ((*(unitArray))->getType() == INFANTRY )
-       {
-            EXP += (*(unitArray))->getAttackScore();
-       }
-       else if((*(unitArray))->getType() == VEHICLE)
-       {
-            LF +=  (*(unitArray))->getAttackScore();
-       }
-    }
-    };
-    virtual void fight(Army *enemy, bool defense = false) = 0
-    {
-
-    };
+    Army(Unit **unitArray, int size, string name, BattleField *battleField);
+  
+    virtual void fight(Army *enemy, bool defense = false) = 0;
     virtual string str() const = 0
     {
         string s ="ARVN[";
@@ -156,28 +153,64 @@ public:
         "EXP" + "=" + to_string(EXP) + "," +
         "unitList" + "=" + unitList->str() + "," +
         "battleField" + "=" + battleField->str() + "]";
-    };
+    }; 
+     virtual ~Army();
 };
+ Army::Army(Unit **unitArray, int size, string name, BattleField *battleField) : LF(0), EXP(0), name(name), battleField(battleField)
+ { 
+    int S = LF + EXP;
+    int capacity = 8;
+    for (int base: {3, 5, 8})
+    {
+       UnitList unitListInstance;
+       if (unitListInstance.isSpecialNumber(S, base))
+       {
+        capacity = 12;
+       };
+    }
+    unitList = new UnitList(capacity); 
+    for (int i=0; i<size; i++)
+    {
+    if ((*(unitArray))->getType() == INFANTRY )
+    {
+         EXP += (*(unitArray))->getAttackScore();
+    }
+    else if((*(unitArray))->getType() == VEHICLE)
+    {
+         LF +=  (*(unitArray))->getAttackScore();
+    }
+    if (EXP > 500) EXP = 500;
+    else if (EXP < 0) EXP = 0;
 
-class LiberationArmy : Army
+    if (LF > 1000) LF = 1000;
+    else if (LF < 0) LF = 0;
+ }
+ };
+ Army::~Army() {
+    delete unitList;
+}
+class LiberationArmy : public Army
 {
     private:
     public:
     
-    LiberationArmy(const Unit** unitArray , int size , string name , BattleField* battleField)
+    LiberationArmy(Unit** unitArray , int size , string name , BattleField* battleField) : Army (unitArray,  size,  name,  battleField)
+    { }
+    void fight(Army* enemy , bool defense = false) override
     {
-        
-    }
-    void fight(Army* enemy , bool defense = false)
-    {
-        if (defense == 0)
+        if (defense == false)
         {
             LF*=1.5;
             EXP*=1.5;
+            if (EXP > 500) EXP = 500;
+          else if (EXP < 0) EXP = 0;
+
+          if (LF > 1000) LF = 1000;
+          else if (LF < 0) LF = 0;
 
         }
     }
-
+    string str() const override;
 };
 
 class ARVN : Army
@@ -186,30 +219,51 @@ class ARVN : Army
 };
 
 
-class UnitList : public Vehicle, Infantry
+class UnitList
 {
 private:
-
-    
-    int capacity;  
+  int capacity;  
+  int countVehicle;
+  int countInfantry;
+  Node* head;
+ 
 public:
 
-    UnitList(int capacity): capacity(capacity)
-    {};
-    bool insert(Unit *unit)
-    {
-
-
-    }
-    
+    UnitList();
+    UnitList(int capacity);
+    ~UnitList();
+    bool insert(Unit *unit);
+  
     // return true if insert successfully
     bool isContain(VehicleType vehicleType);   // return true if it exists
     bool isContain(InfantryType infantryType); // return true if it exists
     string str() const;
-    // TODO
+    // TODO 
+    bool isSpecialNumber(int num, int base) ;
 };
 
+UnitList:: UnitList(int capacity):capacity(capacity), countVehicle(0), countInfantry(0), head(nullptr)  {}
 
+
+UnitList:: ~UnitList()
+{
+    Node* current = head;
+    while(current)
+        {   Node* temp = current;
+            current = current->next;
+            delete temp->data;
+            delete temp;
+           
+        }
+}
+bool UnitList:: isSpecialNumber (int num, int base)
+{
+    while (num>0)
+    {   if (num%base > 1) return false;
+        num/=base;
+    }
+    return true;
+}
 class Position
 {
 private:
@@ -247,21 +301,56 @@ public:
     {
         return "(" + to_string(r) + "," + to_string(c) + ")";
     }; // Example: returns "(1,15)"
+    int getDistance(Position pos1, Position pos2)
+    {   double r = sqrt(pow((pos1.getRow()-pos2.getRow()),2)+pow((pos1.getCol()-pos2.getCol),2));
+        return ceil(r);
+    }
 };
 
-class TerrainElement
+class TerrainElement : public BattleField
 {
 public:
     TerrainElement();
     ~TerrainElement();
     virtual void getEffect(Army *army) = 0;
 };
-class Road;
-class Mountain;
-class River;
-class Urban;
-class Fortification;
-class SpecialZone;
+class Road: public TerrainElement{
+
+public:
+void getEffect(Army *army)
+{}
+
+};
+class Mountain : public TerrainElement{
+    public:
+    void getEffect(Army *army)
+    {}
+
+};
+class River : public TerrainElement{
+    public:
+    void getEffect(Army *army)
+    {}
+
+};
+class Urban : public TerrainElement{
+    public:
+    void getEffect(Army *army)
+    {}
+
+};
+class Fortification : public TerrainElement{
+    public:
+    void getEffect(Army *army)
+    {}
+
+};
+class SpecialZone : public TerrainElement{
+    public:
+    void getEffect(Army *army)
+    {}
+
+};
 class BattleField
 {
 private:
@@ -274,7 +363,14 @@ public:
     ~BattleField();
 };
 class Configuration
-{
+{ 
+    private:
+    int  num_rows, num_cols;
+    vector<Position *> arrayForest, arrayRiver, arrayFortification, arrayUrban, arraySpecialZone;
+    Unit*  liberationUnits;
+    Unit* ARVNUnits;
+    int eventCode;
+    public:
 
 
 };

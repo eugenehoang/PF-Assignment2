@@ -3,6 +3,7 @@
     "vector": "cpp",
     "xstring": "cpp",
     "xlocinfo": "cpp",
-    "xutility": "cpp"
+    "xutility": "cpp",
+    "format": "cpp"
   }
 }

@@ -49,10 +49,6 @@ enum Type
     VEHICLE,
     INFANTRY
 };
-class LinkedLists{
-
-
-};
  class Node 
  {  public:
     Unit* data;
@@ -61,28 +57,15 @@ class LinkedLists{
     Node(Unit* unit) : data(unit), next(nullptr){}
     // constr
  };
- class LinkedList
- {  private:
-    Node* head = new Node();
+ class UnitList {
+    private:
+    Node* head;
+    int capacity;
+    int countVehicle;
+    int countInfantry;
+    bool isSpecialNumber(int number);
     public:
-    Node* getHead() {return head;}
-
-    LinkedList();
-    ~LinkedList()
-    {
-        Node* now = head;
-        while (now)
-        {
-            Node* temp = now;
-            now = now->next;
-            delete temp; 
-        }
-        delete now;
-        void add(Unit *uInfantry);
-        void add(Unit *uVehicle);
-    }
-
-     
+    UnitList(int capacity);
  };
 enum VehicleType
 {
