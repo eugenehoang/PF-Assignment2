@@ -10,6 +10,7 @@
 
 #include "hcmcampaign.h"
 
+
 using namespace std;
 
 void g_satc_01() {
@@ -32,13 +33,21 @@ void g_satc_02() {
     unitArrayOfLiber[0] = &tankOfLiber;
     unitArrayOfLiber[1] = &truckOfLiber;
     unitArrayOfLiber[2] = &sniperOfLiber;
-
+ cout << "naevis calling ae";
+ cout <<  unitArrayOfLiber[0]->getName() << " " <<
+ unitArrayOfLiber[1] << " " <<
+ unitArrayOfLiber[2];
     Unit** unitArrayOfAr = new Unit*[3];
     unitArrayOfAr[0] = &tankOfAr;
     unitArrayOfAr[1] = &truckOfAr;
     unitArrayOfAr[2] = &sniperOfAr;
-
+    UnitList* test = new UnitList;
+    test->insert(unitArrayOfAr[0]);
+    test->insert(unitArrayOfAr[1]);
+    test->insert(unitArrayOfAr[2]);
+    cout << test->str();
     LiberationArmy* liberationArmy = new LiberationArmy(unitArrayOfLiber, 3, "LiberationArmy", 0);
+    
     cout << liberationArmy->str() << endl;
     ARVN* arvn = new ARVN(unitArrayOfAr, 3, "ARVN", 0);
     cout << arvn->str() << endl;
